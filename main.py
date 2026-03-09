@@ -8,26 +8,39 @@ def main():
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
     
+    # Initialize pygame, screen and clock
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
     dt = 0
     
-    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    # Create groups
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
     
+    # Add objects to groups
+    Player.containers = (updatable, drawable)
+    
+    # Set player position
+    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+   
+    # Game event loop
     while True:
         log_state()
         
         for event in pygame.event.get():
+            # Enable the quit icon
             if event.type == pygame.QUIT:
                 return
         
-        screen.fill("black")
+        updatable.update(dt)
         
-        player.draw(screen)
-        player.update(dt)
-
+        screen.fill("black")
+        for obj in drawable:
+            obj.draw(screen)
         pygame.display.flip()
+        
+        # Limit fps to 60
         dt = clock.tick(60) / 1000
 
 
