@@ -1,4 +1,4 @@
-import pygame
+import pygame  # pyright: ignore[reportMissingImports]
 
 from circleshape import CircleShape
 from constants import LINE_WIDTH

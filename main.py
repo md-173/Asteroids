@@ -1,11 +1,14 @@
-import pygame  # pyright: ignore[reportMissingImports]
+import ast
 import sys
+
+import pygame  # pyright: ignore[reportMissingImports]
 
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-from logger import log_state, log_event
+from logger import log_event, log_state
 from player import Player
+from shot import Shot
 
 
 def main():
@@ -23,13 +26,15 @@ def main():
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
+    Shot.containers = (shots, drawable, updatable)
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-    asteroid_field = AsteroidField()
+    asteroid_field = AsteroidField()  # pyright: ignore[reportUnusedVariable]
 
     while True:
         log_state()
@@ -43,6 +48,14 @@ def main():
                 log_event("player_hit")
                 print("Game over!")
                 sys.exit()
+
+        for asteroid in asteroids:
+            for shot in shots:
+                if asteroid.collides_with(shot):
+                    log_event("asteroid_shot")
+                    asteroid.kill()
+                    shot.kill()
+
         for drawables in drawable:
             drawables.draw(screen)
         pygame.display.flip()
