@@ -22,6 +22,8 @@ def main():
     clock = pygame.time.Clock()
     dt = 0.0
 
+
+
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     updatable = pygame.sprite.Group()
@@ -39,6 +41,20 @@ def main():
     asteroid_field = AsteroidField()  # pyright: ignore[reportUnusedVariable]
     score_board = ScoreBoard()
 
+
+    #TODO: only update high_score when txt file contains a value
+
+    try:
+        with open("high_score.txt", 'x') as f:
+            f.write("1")
+            print("writing new high score file")
+    except FileExistsError:
+        print("High score file already exists")
+
+    with open("high_score.txt", "r") as f:
+        high_score = f.read()
+        score_board.high_score = int(high_score)
+
     while True:
         log_state()
         for event in pygame.event.get():
@@ -50,6 +66,11 @@ def main():
             if asteroid.collides_with(player):
                 log_event("player_hit")
                 print("Game over!")
+                if int(score_board.score) >= int(score_board.high_score):
+                    print("printing high score to file")
+                    with open("high_score.txt", "w") as f:
+                        f.write(f"{score_board.score}")
+                        f.close()
                 sys.exit()
 
         for asteroid in asteroids:
@@ -57,6 +78,8 @@ def main():
                 if asteroid.collides_with(shot):
                     log_event("asteroid_shot")
                     score_board.score += 10
+                    if score_board.score > score_board.high_score:
+                        score_board.high_score = score_board.score
                     asteroid.split()
                     shot.kill()
 
