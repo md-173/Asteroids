@@ -3,6 +3,7 @@ import pygame
 from drawtext import draw_text
 from constants import SCREEN_WIDTH
 
+# TODO: Move the score, high-score, lives into player class
 
 class ScoreBoard(pygame.sprite.Sprite):
 
@@ -12,6 +13,7 @@ class ScoreBoard(pygame.sprite.Sprite):
         self.text_font = pygame.font.SysFont("Arial", 50)
         self.score = 0
         self.high_score = 0
+        self.lives = 3
 
     def draw(self, screen):
         # Draw current game score
@@ -21,3 +23,6 @@ class ScoreBoard(pygame.sprite.Sprite):
         # Draw High Score
         draw_text(screen, f"High Score", self.text_font, (255,255,255), 30, 10)
         draw_text(screen, f"{self.high_score}", self.text_font, (255,255,255), 110, 70)
+
+        # Draw Lives
+        draw_text(screen, f"Lives: {self.lives}", self.text_font, (255,255,255), SCREEN_WIDTH / 2, 10)

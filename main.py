@@ -1,4 +1,3 @@
-import ast
 import sys
 
 import pygame  # pyright: ignore[reportMissingImports]
@@ -11,6 +10,7 @@ from player import Player
 from scoreboard import ScoreBoard
 from shot import Shot
 
+
 def main():
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
@@ -21,8 +21,6 @@ def main():
 
     clock = pygame.time.Clock()
     dt = 0.0
-
-
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -40,9 +38,6 @@ def main():
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     asteroid_field = AsteroidField()  # pyright: ignore[reportUnusedVariable]
     score_board = ScoreBoard()
-
-
-    #TODO: only update high_score when txt file contains a value
 
     try:
         with open("high_score.txt", 'x') as f:
@@ -65,21 +60,24 @@ def main():
         for asteroid in asteroids:
             if asteroid.collides_with(player):
                 log_event("player_hit")
-                print("Game over!")
-                if int(score_board.score) >= int(score_board.high_score):
-                    print("printing high score to file")
-                    with open("high_score.txt", "w") as f:
-                        f.write(f"{score_board.score}")
-                        f.close()
-                sys.exit()
+                if score_board.lives <= 0:
+                    print("Game over!")
+                    if int(score_board.score) >= int(score_board.high_score):
+                        print("printing high score to file")
+                        with open("high_score.txt", "w") as f:
+                            f.write(f"{score_board.score}")
+                            f.close()
+                    sys.exit()
+                else:
+                    score_board.lives -= 1
+                    player.position = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
         for asteroid in asteroids:
             for shot in shots:
                 if asteroid.collides_with(shot):
                     log_event("asteroid_shot")
                     score_board.score += 10
-                    if score_board.score > score_board.high_score:
-                        score_board.high_score = score_board.score
+                    score_board.high_score = max(score_board.high_score, score_board.score)
                     asteroid.split()
                     shot.kill()
 
