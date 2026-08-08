@@ -8,8 +8,8 @@ from asteroidfield import AsteroidField
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_event, log_state
 from player import Player
+from scoreboard import ScoreBoard
 from shot import Shot
-from drawtext import draw_text
 
 def main():
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
@@ -17,12 +17,10 @@ def main():
     print(f"Screen height: {SCREEN_HEIGHT}")
 
     pygame.init()
+    pygame.font.init()
 
     clock = pygame.time.Clock()
     dt = 0.0
-
-    pygame.font.init()
-    text_font = pygame.font.SysFont("Arial", 30)
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -35,9 +33,11 @@ def main():
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
     Shot.containers = (shots, drawable, updatable)
+    ScoreBoard.containers = (drawable)
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     asteroid_field = AsteroidField()  # pyright: ignore[reportUnusedVariable]
+    score_board = ScoreBoard()
 
     while True:
         log_state()
@@ -46,7 +46,6 @@ def main():
                 return
         screen.fill("black")
         updatable.update(dt)
-        draw_text(screen, f"{player.score}", text_font, (255,255,255), 220, 150)
         for asteroid in asteroids:
             if asteroid.collides_with(player):
                 log_event("player_hit")
@@ -57,13 +56,12 @@ def main():
             for shot in shots:
                 if asteroid.collides_with(shot):
                     log_event("asteroid_shot")
-                    player.score += 10
+                    score_board.score += 10
                     asteroid.split()
                     shot.kill()
 
         for drawables in drawable:
             drawables.draw(screen)
-
 
         pygame.display.flip()
         dt = clock.tick(60) / 1000
